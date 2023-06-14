@@ -1,28 +1,23 @@
 {
   "tasks": [
     {
-      "task": "dcpdshnvcdcvsd",
-      "date": "2023-06-15",
-      "id": 1
-    },
-    {
-      "task": "ldsnkkk",
-      "date": "2023-06-15",
-      "id": 2
-    },
-    {
-      "task": "dvcsdv",
+      "task": "utydthg",
       "date": "2023-06-15",
       "priority": "Medium",
       "completed": false,
-      "id": 3
+      "id": 1
+    }
+  ],
+  "users": [
+    {
+      "email": "mpho@gmail.com",
+      "password": "mpho",
+      "id": 1
     },
     {
-      "task": "nsoijewn",
-      "date": "2023-06-15",
-      "priority": "High",
-      "completed": false,
-      "id": 4
+      "email": "konka@gmail.com",
+      "password": "phodesta",
+      "id": 2
     }
   ]
 }

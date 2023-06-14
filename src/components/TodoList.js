@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function TodoList() {
@@ -10,13 +11,16 @@ function TodoList() {
   const [editTaskDate, setEditTaskDate] = useState('');
   const [priority, setPriority] = useState('High');
 
+  const [loggedIn, setLoggedIn] = useState(false);
+  const nav = useNavigate();
+
   useEffect(() => {
     fetchTasks();
   }, []);
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('http://localhost:3002/tasks');
+      const response = await axios.get('http://localhost:3001/tasks');
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -27,7 +31,7 @@ function TodoList() {
   const createTask = async () => {
     if (newTask && newDate) {
       try {
-        const response = await axios.post('http://localhost:3002/tasks', {
+        const response = await axios.post('http://localhost:3001/tasks', {
           task: newTask,
           date: newDate,
           priority: priority,
@@ -45,7 +49,7 @@ function TodoList() {
   //function to delete the task
   const deleteTask = async (taskId) => {
     try {
-      await axios.delete(`http://localhost:3002/tasks/${taskId}`);
+      await axios.delete(`http://localhost:3001/tasks/${taskId}`);
       const updatedTasks = tasks.filter((task) => task.id !== taskId);
       setTasks(updatedTasks);
     } catch (error) {
@@ -63,7 +67,7 @@ function TodoList() {
   const saveEditedTask = async () => {
     if (editTaskText && editTaskDate) {
       try {
-        await axios.put(`http://localhost:3002/tasks/${editTaskId}`, {
+        await axios.put(`http://localhost:3001/tasks/${editTaskId}`, {
           task: editTaskText,
           date: editTaskDate,
         });
@@ -84,6 +88,19 @@ function TodoList() {
     setEditTaskId('');
     setEditTaskText('');
     setEditTaskDate('');
+  };
+
+  const markTaskComplete = (taskId) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, completed: true } : task
+    );
+    setTasks(updatedTasks);
+  };
+
+  
+  const handleLogout = () => {
+    setLoggedIn(false);
+    nav('/');
   };
 
   return (
@@ -108,6 +125,7 @@ function TodoList() {
         </select>
 
         <button class="btn btn-primary" onClick={createTask} ><i class="bi bi-file-earmark-plus"></i></button>
+       <button onClick={handleLogout}>Logout</button>
       </div>
 
 
@@ -116,7 +134,8 @@ function TodoList() {
         {tasks.map((task) => (
           <li key={task.id} 
           style={{
-            color: task.priority === 'High' ? 'red' : task.priority === 'Medium' ? 'orange' : 'yellow'}}>
+            color: task.priority === 'High' ? 'red' : task.priority === 'Medium' ? 'orange' : 'yellow',
+            textDecoration: task.completed ? 'line-through' : 'none'}}>
             {editTaskId === task.id ? (
               <>
                 <input
@@ -136,6 +155,9 @@ function TodoList() {
               <>
                 <div><span>{task.task}</span></div>
                 <div><span>{task.date}</span></div>
+                {!task.completed && (
+              <button class="btn btn-success" onClick={() => markTaskComplete(task.id)}><i class="bi bi-check-lg"></i></button>
+            )}
                 <button class="btn btn-primary" onClick={() => handleEditTask(task)}><i class="bi bi-pen"></i></button>
                 <button class="btn btn-danger" onClick={() => deleteTask(task.id)}><i class="bi bi-trash3"></i></button>
               </>
