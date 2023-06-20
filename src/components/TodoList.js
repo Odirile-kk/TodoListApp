@@ -1,106 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchTasks, addTask, deleteTask, updateTask } from './tasksSlice';
+import { toggleTaskCompletion } from './tasksSlice';
 
-function TodoList() {
-  const [tasks, setTasks] = useState([]);
+function TodoList( {task}) {
   const [newTask, setNewTask] = useState('');
   const [newDate, setNewDate] = useState('');
-  const [editTaskId, setEditTaskId] = useState('');
-  const [editTaskText, setEditTaskText] = useState('');
-  const [editTaskDate, setEditTaskDate] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
   const [priority, setPriority] = useState('High');
 
-  const [loggedIn, setLoggedIn] = useState(false);
-  const nav = useNavigate();
+  const tasks = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
-  const fetchTasks = async () => {
-    try {
-      const response = await axios.get('http://localhost:3001/tasks');
-      setTasks(response.data);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    }
-  };
-
-  //function to create the task and store it in the json server
-  const createTask = async () => {
+  const handleAddTask = () => {
     if (newTask && newDate) {
-      try {
-        const response = await axios.post('http://localhost:3001/tasks', {
-          task: newTask,
-          date: newDate,
-          priority: priority,
-          completed: false,
+      dispatch(addTask({ 
+        task: newTask, 
+        date: newDate,
+        priority: priority,
+        completed: false
+        }))
+        .then(() => {
+          setNewTask('');
+          setNewDate('');
+        })
+        .catch((error) => {
+          console.error('Error adding task:', error);
         });
-        setTasks([...tasks, response.data]);
-        setNewTask('');
-        setNewDate('');
-      } catch (error) {
-        console.error('Error creating task:', error);
-      }
     }
   };
 
-  //function to delete the task
-  const deleteTask = async (taskId) => {
-    try {
-      await axios.delete(`http://localhost:3001/tasks/${taskId}`);
-      const updatedTasks = tasks.filter((task) => task.id !== taskId);
-      setTasks(updatedTasks);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
+  const handleDeleteTask = (taskId) => {
+    dispatch(deleteTask(taskId))
+      .catch((error) => {
+        console.error('Error deleting task:', error);
+      });
   };
 
- 
-  const handleEditTask = async (task) => {
-    setEditTaskId(task.id);
-    setEditTaskText(task.task);
-    setEditTaskDate(task.date);
+  const handleEditTask = (task) => {
+    setEditingTask(task.id);
+    setNewTask(task.task);
+    setNewDate(task.date);
   };
 
-  const saveEditedTask = async () => {
-    if (editTaskText && editTaskDate) {
-      try {
-        await axios.put(`http://localhost:3001/tasks/${editTaskId}`, {
-          task: editTaskText,
-          date: editTaskDate,
+  const handleUpdateTask = () => {
+    if (newTask && newDate && editingTask) {
+      const updatedTask = { id: editingTask, task: newTask, date: newDate };
+      dispatch(updateTask(updatedTask))
+        .unwrap()
+        .then(() => {
+          setEditingTask(null);
+          setNewTask('');
+          setNewDate('');
+        })
+        .catch((error) => {
+          console.error('Error updating task:', error);
         });
-        const updatedTasks = tasks.map((task) =>
-          task.id === editTaskId ? { ...task, task: editTaskText, date: editTaskDate } : task
-        );
-        setTasks(updatedTasks);
-        setEditTaskId('');
-        setEditTaskText('');
-        setEditTaskDate('');
-      } catch (error) {
-        console.error('Error updating task:', error);
-      }
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditTaskId('');
-    setEditTaskText('');
-    setEditTaskDate('');
-  };
-
-  const markTaskComplete = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: true } : task
-    );
-    setTasks(updatedTasks);
-  };
-
-  
-  const handleLogout = () => {
-    setLoggedIn(false);
-    nav('/');
+  const handleToggleCompletion = (taskId) => {
+    dispatch(toggleTaskCompletion(taskId));
   };
 
   return (
@@ -123,12 +88,14 @@ function TodoList() {
           <option value="Medium">Medium</option>
           <option value="Low">Low</option>
         </select>
-
-        <button class="btn btn-primary" onClick={createTask} ><i class="bi bi-file-earmark-plus"></i></button>
-       <button onClick={handleLogout}>Logout</button>
-      </div>
-
-
+      
+      {!editingTask ? (
+          <button class="btn btn-primary" onClick={handleAddTask} ><i class="bi bi-file-earmark-plus"></i></button>
+        ) : (
+          <button className="btn btn-success" onClick={handleUpdateTask}><i class="bi bi-check-lg"></i></button>
+        )}
+         <Link to={'/'} className="btn btn-danger" ><i class="bi bi-x-square"></i></Link>
+        </div>
         <div className='container-tasks'>
       <ul className='list-task'>
         {tasks.map((task) => (
@@ -136,32 +103,14 @@ function TodoList() {
           style={{
             color: task.priority === 'High' ? 'red' : task.priority === 'Medium' ? 'orange' : 'yellow',
             textDecoration: task.completed ? 'line-through' : 'none'}}>
-            {editTaskId === task.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editTaskText}
-                  onChange={(e) => setEditTaskText(e.target.value)}
-                />
-                <input
-                  type="date"
-                  value={editTaskDate}
-                  onChange={(e) => setEditTaskDate(e.target.value)}
-                />
-                <button class="btn btn-success" onClick={saveEditedTask}><i class="bi bi-check"></i></button>
-                <button class="btn btn-danger" onClick={handleCancelEdit}><i class="bi bi-x"></i></button>
-              </>
-            ) : (
-              <>
                 <div><span>{task.task}</span></div>
                 <div><span>{task.date}</span></div>
-                {!task.completed && (
-              <button class="btn btn-success" onClick={() => markTaskComplete(task.id)}><i class="bi bi-check-lg"></i></button>
-            )}
-                <button class="btn btn-primary" onClick={() => handleEditTask(task)}><i class="bi bi-pen"></i></button>
-                <button class="btn btn-danger" onClick={() => deleteTask(task.id)}><i class="bi bi-trash3"></i></button>
-              </>
-            )}
+
+            <button className="btn btn-primary" onClick={() => handleEditTask(task)}><i class="bi bi-pen"></i></button>
+            <button className="btn btn-danger" onClick={() => handleDeleteTask(task.id)}><i class="bi bi-trash"></i></button>
+            
+              <button class="btn btn-success" onClick={() => handleToggleCompletion(task.id)}><i class="bi bi-check-lg"></i></button>
+           
           </li>
         ))}
       </ul>
@@ -169,5 +118,6 @@ function TodoList() {
     </div>
   );
 }
+
 
 export default TodoList;

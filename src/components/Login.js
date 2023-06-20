@@ -1,74 +1,59 @@
-import React from 'react'
 import { useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from './userSlice';
+import { setEmail, setPassword, setValidate } from './userSlice';
 
 const Login = () => {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const nav = useNavigate();
+  const nav = useNavigate()
     
-    const [loggedIn, setLoggedIn] = useState(false);
+    const {email, password, validate} = useSelector((state) => state.user);
+    const dispatch = useDispatch();
 
-    const handleLogin = () => {
-        setLoggedIn(true);
-      };
-  
+    console.log("this is validate before " + validate)
     const handleEmailChange = (event) => {
-      setEmail(event.target.value);
+      dispatch(setEmail(event.target.value));
     };
   
     const handlePasswordChange = (event) => {
-      setPassword(event.target.value);
+      dispatch(setPassword(event.target.value));
     };
-  
-    const handleFormSubmit = async (event) => {
-      event.preventDefault();
-  
-      try {
-        // Validate user input
-        if (email && password) {
-          // Check if user exists and credentials are correct
-          const response = await axios.get(`http://localhost:3001/users?email=${email}&password=${password}`);
-          if (response.data.length > 0) {
-            handleLogin();
-            alert('login successful');
-            nav('/todolist');
-          } else {
-            alert('Invalid email or password');
-            window.location.reload();
-          }
-        } else {
-          alert('Please enter both email and password');
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Error logging in:', error);
+
+    const handleFormSubmit = () => {
+      dispatch(loginUser());
+      dispatch(setValidate())
+      if(validate == true){
+          nav('/todolist')
+      }
+      else {
+          console.log("value of validate is : " +  validate)
+          //window.location.reload()
       }
     };
 
-
   return (
     <section>
-        <div class="form-box">
-            <div class="form-value">
-                <form onSubmit={handleFormSubmit}>
+        <div className="form-box">
+            <div className="form-value">
+                <div >
                     <h2>Login</h2>
-                    <div class="inputbox">
+                    
+                    <div className="inputbox">
                         <input type="email" required value={email} onChange={handleEmailChange} />
-                        <label for="">Email</label>
+                        <label htmlFor="">Email</label>
                     </div>
-                    <div class="inputbox">
+                    <div className="inputbox">
                         <input type="password" required value={password} onChange={handlePasswordChange}/>
-                        <label for="">Password</label>
+                        <label htmlFor="">Password</label>
                     </div>
-                    <button type="submit" class="btn btn-secondary">Login</button>
+                    <button className="btn btn-secondary" onClick={handleFormSubmit}>Login</button>
                    
-                    <div class="register">
-                        <p >Don't have a account? <a href="Register">Register</a></p>
+                    <div className="register">
+                        <p >Don't have a account? <Link to={'/'}>Register</Link></p>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </section>

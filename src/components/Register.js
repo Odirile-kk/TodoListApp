@@ -1,81 +1,59 @@
-import {useEffect, useState} from 'react';
-import { Link, useNavigate} from 'react-router-dom';
-import axios from 'axios';
-import { toast } from "react-toastify";
+import { useState} from 'react';
+import { useNavigate} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from './userSlice';
+import {Link} from 'react-router-dom';
+import { setEmail, setPassword, setValidate } from './userSlice';
 
 
 const Register = () => {
 
-    
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loggedIn, setLoggedIn] = useState(false);
     const nav = useNavigate();
 
-  const handleRegistration = () => {
-    setLoggedIn(true);
-  };
-  
+    const {email, password, validate} = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+ 
     const handleEmailChange = (event) => {
-      setEmail(event.target.value);
+      dispatch(setEmail(event.target.value));
     };
   
     const handlePasswordChange = (event) => {
-      setPassword(event.target.value);
+      dispatch(setPassword(event.target.value));
     };
   
-    const handleFormSubmit = async (event) => {
-      event.preventDefault();
-  
-      try {
-        // Validate user input
-        if (email && password) {
-          // Check if user already exists
-          const response = await axios.get(`http://localhost:3001/users?email=${email}`);
-          if (response.data.length > 0) {
-            alert('Email already registered');
-            window.location.reload();
-          } else {
-            // Create new user
-            const newUser = { email, password };
-            await axios.post('http://localhost:3001/users', newUser);
-            handleRegistration();
-            alert('registered successfully');
-            nav('/');
-          }
-        } else {
-          setError('Please fill in all fields');
+    const handleFormSubmit = () => {
+        dispatch(registerUser());
+        dispatch(setValidate())
+        if(validate){
+            nav('/login')
         }
-      } catch (error) {
-        console.error('Error registering user:', error);
-      }
+        else {
+            console.log("value of validate is : " +  validate)
+           
+        }
     };
-
-
-
 
   return (
     
 	  <section>
-        <div class="form-box">
-            <div class="form-value">
-                <form onSubmit={handleFormSubmit}>
+        <div className="form-box">
+            <div className="form-value">
+                <div >
                     <h2>Register</h2>
-                    <div class="inputbox">
+                    <div className="inputbox">
                         <input type="email" required value={email} onChange={handleEmailChange}/>
-                        <label for="">Email</label>
+                        <label htmlFor="">Email</label>
                     </div>
-                    <div class="inputbox">
+                    <div className="inputbox">
                         <input type="password" required value={password} onChange={handlePasswordChange}/>
-                        <label for="">Password</label>
+                        <label htmlFor="">Password</label>
                     </div>
                     
-                    <button class="btn btn-secondary" type='submit'>Register</button>
-                    <div class="register">
-                        <p>Already have an account?<a href="login">Login</a></p>
+                    <button className="btn btn-secondary" onClick={handleFormSubmit} type='submit'>Register</button>
+                    <div className="register">
+                        <p>Already have an account?<Link to={'/login'}>Login</Link></p>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </section>

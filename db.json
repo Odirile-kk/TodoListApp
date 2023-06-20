@@ -6,6 +6,63 @@
       "priority": "Medium",
       "completed": false,
       "id": 1
+    },
+    {
+      "id": 2,
+      "task": "sijpsaj",
+      "date": "2023-06-22"
+    },
+    {
+      "id": 3,
+      "task": "kjdsijpa",
+      "date": "2023-06-23"
+    },
+    {
+      "task": "ojdslkm",
+      "date": "2023-06-22",
+      "priority": "High",
+      "completed": false,
+      "id": 4
+    },
+    {
+      "task": "sajbdkj",
+      "date": "2023-06-22",
+      "priority": "Medium",
+      "completed": false,
+      "id": 5
+    },
+    {
+      "task": "ksdjck",
+      "date": "2023-06-22",
+      "priority": "Medium",
+      "completed": false,
+      "id": 6
+    },
+    {
+      "task": "knhajbd",
+      "date": "2023-06-21",
+      "priority": "Medium",
+      "completed": false,
+      "id": 7
+    },
+    {
+      "task": "knlkl",
+      "date": "2023-06-23",
+      "priority": "Low",
+      "completed": false,
+      "id": 8
+    },
+    {
+      "task": "iusoiahp",
+      "date": "2023-06-22",
+      "priority": "High",
+      "completed": false,
+      "id": 9
+    },
+    {
+      "id": 11,
+      "task": "mdsk",
+      "date": "2023-06-29"
     }
   ],
   "users": [
@@ -13,11 +70,6 @@
       "email": "mpho@gmail.com",
       "password": "mpho",
       "id": 1
-    },
-    {
-      "email": "konka@gmail.com",
-      "password": "phodesta",
-      "id": 2
     }
   ]
 }
