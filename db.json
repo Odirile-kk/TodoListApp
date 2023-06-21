@@ -70,6 +70,11 @@
       "email": "mpho@gmail.com",
       "password": "mpho",
       "id": 1
+    },
+    {
+      "email": "milton@gmail.com",
+      "password": "milton",
+      "id": 2
     }
   ]
 }

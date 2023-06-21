@@ -18,14 +18,14 @@ export const registerUser = createAsyncThunk('user/registerUser', async (_, thun
         // Validate user input
         if (email && password) {
           // Check if user already exists
-          const response = await axios.get(`http://localhost:3000/users?email=${email}`);
+          const response = await axios.get(`http://localhost:3002/tasks?email=${email}`);
           if (response.data.length > 0) {
             alert('Email already registered');
            
           } else {
             // Create new user
             const newUser = { email, password };
-            await axios.post('http://localhost:3000/users', newUser);
+            await axios.post('http://localhost:3002/api/tasks', newUser);
             alert('registered successfully');
             return response.data
           }
@@ -44,7 +44,7 @@ export const loginUser = createAsyncThunk('users/loginUser', async (_, thunkAPI)
     // Validate user input
     if (email && password) {
       // Check if user exists and credentials are correct
-      const response = await axios.get(`http://localhost:3000/users?email=${email}&password=${password}`);
+      const response = await axios.get(`http://localhost:3002/api/tasks?email=${email}&password=${password}`);
       if (response.data.length > 0) {
         alert('login successful');
       } else {
