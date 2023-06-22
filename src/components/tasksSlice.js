@@ -2,22 +2,22 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
-  const response = await axios.get('http://localhost:3002/api/tasks');
+  const response = await axios.get('http://localhost:3002/tasks');
   return response.data;
 });
 
 export const addTask = createAsyncThunk('tasks/addTask', async (task) => {
-  const response = await axios.post('http://localhost:3002/api/tasks', task);
+  const response = await axios.post('http://localhost:3002/tasks', task);
   return response.data;
 });
 
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId) => {
-  await axios.delete(`http://localhost:3002/api/tasks/${taskId}`);
+  await axios.delete(`http://localhost:3002/tasks/${taskId}`);
   return taskId;
 });
 
 export const updateTask = createAsyncThunk('tasks/updateTask', async (task) => {
-  const response = await axios.put(`http://localhost:3002/api/tasks/${task.id}`, task);
+  const response = await axios.put(`http://localhost:3002/tasks/${task.id}`, task);
   return response.data;
 });
 
