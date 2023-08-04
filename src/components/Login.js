@@ -24,12 +24,12 @@ const Login = () => {
     const handleFormSubmit = () => {
       dispatch(loginUser());
       dispatch(setValidate())
-      if(validate == true){
+      if(validate === true){
           nav('/todolist')
       }
       else {
           console.log("value of validate is : " +  validate)
-          //window.location.reload()
+          window.location.reload()
       }
     };
 
